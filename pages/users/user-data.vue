@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getCookie } from "@/mixins/cookies";
 import axios from "axios"
+import { useUserStore } from "~~/stores/userStore";
 const config = useRuntimeConfig();
 const userData = ref([])
 const searchValue = ref('')
@@ -187,7 +188,8 @@ const items = ref([{ name: "Users Source", value: "" }, { name: "Islamic Academy
                     </tbody>
                 </v-table>
             </v-card-item>
-            <div className="flex gap-5 text-lg justify-end items-center py-12">
+
+            <div className="flex gap-5 text-lg justify-end items-center py-12 px-6">
                 <button @click="() => page--" v-if="page !== 1"
                     className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -208,5 +210,6 @@ const items = ref([{ name: "Users Source", value: "" }, { name: "Islamic Academy
                 </button>
             </div>
         </v-card>
+
     </div>
 </template>

@@ -39,14 +39,24 @@ const chartOptions = computed(() => {
         tooltip: { theme: "light", fillSeriesColor: false },
     };
 });
+
+const props = defineProps({
+    option: {
+        type: Object,
+    },
+    height: {
+        type: Number,
+    },
+    chart: {
+        type: Array,
+    }
+})
+
 const Chart = [38, 40, 25];
 </script>
 <template>
     <v-card elevation="10" class="withbg">
         <v-card-item>
-            <div class="d-sm-flex align-center justify-space-between pt-sm-2">
-                <v-card-title class="text-h5">Yearly Breakup</v-card-title>
-            </div>
             <v-row>
                 <v-col cols="7" sm="7">
                     <div class="mt-6">
@@ -72,10 +82,12 @@ const Chart = [38, 40, 25];
                 </v-col>
                 <v-col cols="5" sm="5" class="pl-lg-0">
                     <div class="d-flex align-center flex-shrink-0">
-                        <apexchart class="pt-6" type="donut" height="145" :options="chartOptions" :series="Chart">
+                        <apexchart class="pt-6" type="donut" :height="props.height" :options="props.option"
+                            :series="props.chart">
                         </apexchart>
                     </div>
                 </v-col>
             </v-row>
         </v-card-item>
-</v-card></template>
+    </v-card>
+</template>
