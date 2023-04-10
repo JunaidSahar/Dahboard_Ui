@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { setCookie } from "@/mixins/cookies";
 import { useUserStore } from "~~/stores/userStore";
+import '@dmuy/toast/dist/mdtoast.css'
+import mdtoast from '@dmuy/toast'
 import axios from "axios";
 const config = useRuntimeConfig();
 const userStore = useUserStore();
@@ -40,9 +42,11 @@ function login() {
         userStore.user = res.data.user;
         setCookie("access_token", res.data.access_token, 7);
         setCookie("refresh_token", res.data.refresh_token, 365);
+        mdtoast('Signin Successfully', { duration: 5000, type: mdtoast.SUCCESS });
         router.push('/')
     }).catch((err) => {
-        alert(err);
+        mdtoast(`Something went wrong`, { duration: 5000, type: mdtoast.ERROR });
+
     });
 }
 </script>

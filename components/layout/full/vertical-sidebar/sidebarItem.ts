@@ -37,6 +37,11 @@ const sidebarItem: menu[] = [
         icon: TypographyIcon,
         to: '/users/payment-data'
     },
+    {
+        title: 'Renewal Payment',
+        icon: TypographyIcon,
+        to: '/users/renewal-payment'
+    },
     { header: 'auth' },
     {
         title: 'Login',

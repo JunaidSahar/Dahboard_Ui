@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { getCookie } from "@/mixins/cookies";
+import { useUserStore } from "~~/stores/userStore";
 import axios from "axios"
 const config = useRuntimeConfig();
+const userStore = useUserStore();
 const userData = ref([])
 const searchValue = ref('')
 const source = ref('');
 const startDate = ref('');
 const endtDate = ref('');
+const page = ref(1);
+const isLoading = ref(true);
 let x = "Bearer "
 let y = getCookie("access_token")
 console.log()
@@ -14,11 +18,12 @@ console.log()
 
 
 watchEffect(() => {
-    axios.get(config.public.API_BASE_URL + `payments/searchpayment/?&q=${searchValue.value}&source=${source.value}&start_date=${startDate.value}&start_date=${endtDate.value}`, {
+    axios.get(config.public.API_BASE_URL + `payments/searchpayment/?&q=${searchValue.value}&source=${source.value}&start_date=${startDate.value}&start_date=${endtDate.value}&page=${page.value}`, {
         headers: {
             Authorization: x + y,
         }
     }).then((res) => {
+        isLoading.value = false
         userData.value = res.data
     })
 })
@@ -91,7 +96,11 @@ watchEffect(() => {
                         </div>
                     </div>
                 </div>
-                <v-table class="month-table">
+                <div class="h-full w-full flex items-center justify-center" v-if="isLoading">
+                    <img class="w-96" src="https://i.pinimg.com/originals/49/23/29/492329d446c422b0483677d0318ab4fa.gif"
+                        alt="">
+                </div>
+                <v-table class="month-table" v-if="!isLoading">
                     <thead>
                         <tr>
                             <th class="text-subtitle-1 font-weight-bold">
@@ -145,55 +154,55 @@ watchEffect(() => {
                     <tbody>
                         <tr class="month-item" v-for="items in userData.results">
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.product_name }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.order_id }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.source }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p cclass="text-15 font-weight-medium">{{ items.transaction_id }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.customer_email }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.amount }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p class="text-15 font-weight-medium">{{ items.credit_card || "-" }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p cclass="text-15 font-weight-medium">{{ items.status }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
                                     <p cclass="text-15 font-weight-medium">{{ items.order_datetime }}</p>
                                 </div>
@@ -203,6 +212,26 @@ watchEffect(() => {
                     </tbody>
                 </v-table>
             </v-card-item>
+            <div className="flex gap-5 text-lg justify-end items-center py-12 px-6">
+                <button @click="() => page--" v-if="page !== 1"
+                    className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.4 16.7998L9.60001 11.9998L14.4 7.19981" stroke="black" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <p
+                    className="block px-5 py-2 text-gray-700 font-semibold placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                    {{ page }}
+                </p>
+                <button @click="() => page++"
+                    className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.59999 7.2002L14.4 12.0002L9.59999 16.8002" stroke="black" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
         </v-card>
     </div>
 </template>

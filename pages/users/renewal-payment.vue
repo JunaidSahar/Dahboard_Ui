@@ -5,21 +5,26 @@ const config = useRuntimeConfig();
 const userData = ref([])
 const searchValue = ref('')
 const source = ref('');
-const startDate = ref('');
-const endtDate = ref('');
-const page = ref(1)
+const day = ref('');
+const exact = ref(false);
+const page = ref(1);
+const isLoading = ref(true)
 let x = "Bearer "
 let y = getCookie("access_token")
 console.log()
 
-
+let daysData = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+];
 
 watchEffect(() => {
-    axios.get(config.public.API_BASE_URL + `user/users/?&q=${searchValue.value}&source=${source.value}&start_date=${startDate.value}&start_date=${endtDate.value}&page=${page.value}`, {
+    axios.get(config.public.API_BASE_URL + `payments/searchalnafipayment/?&q=${searchValue.value}&source=${source.value}&expiration_date=${day.value}&exact=${exact.value}&page=${page.value}`, {
         headers: {
             Authorization: x + y,
         }
     }).then((res) => {
+        isLoading.value = false
         userData.value = res.data
     })
 })
@@ -37,8 +42,9 @@ const items = ref([{ name: "Users Source", value: "" }, { name: "Islamic Academy
     <div class="space-y-4">
         <LazyDashboardYearlyBreakup />
         <v-card elevation="10" class="">
+            <!-- {{ userData.results }} -->
             <v-card-item class="pa-6">
-                <v-card-title class="text-h5 pt-sm-2 pb-7">User Data</v-card-title>
+                <v-card-title class="text-h5 pt-sm-2 pb-7">Renewal Payments Data</v-card-title>
                 <div class="flex flex-wrap px-4 py-8 items-center gap-6 justify-between">
                     <div class="flex md:flex-row flex-col gap-7">
                         <div class="flex relative">
@@ -64,70 +70,83 @@ const items = ref([{ name: "Users Source", value: "" }, { name: "Islamic Academy
                             <select v-model="source" v-on:change="handlFilters"
                                 class="block w-full px-10 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
                                 <option value="">Users Source</option>
-                                <option value="islamicacademyuser">
-                                    Islamic Academy Users
+                                <option value="easypaisa">
+                                    EasyPaisa
                                 </option>
-                                <option value="alnafiuser">Alnafi Users</option>
+                                <option value="stripe">
+                                    Stripe
+                                </option>
+                                <option value="ubl">
+                                    UBL
+                                </option>
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <div class="flex gap-7 md:flex-row flex-col font-medium">
-                            <div class="space-y-2">
+                    <div class="flex gap-7 md:flex-row flex-col font-medium">
+                        <select v-model="day"
+                            class="block w-fit px-8 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
+                            <option value="">Select Day</option>
+                            <option v-for="items in daysData" :value="items"> {{ items }}</option>
+                        </select>
+                        <div
+                            class="flex gap-2 items-center w-full px-10 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
 
-                                <span>Start Time</span>
-                                <input type="date" v-model="startDate"
-                                    class="block py-2 px-6 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" />
-                            </div>
-                            <div class="space-y-2">
-                                <span>End Time</span>
-                                <input type="date" v-model="endtDate"
-                                    class="block py-2 px-6 w-fit text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" />
-                            </div>
+                            <input id="default-checkbox" type="checkbox" :checked="exact" @change="() => exact = !exact"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
+                            <span>Exact Expiry</span>
                         </div>
                     </div>
                 </div>
-                <v-table class="month-table">
+                <div class="h-full w-full flex items-center justify-center" v-if="isLoading">
+                    <img class="w-96" src="https://i.pinimg.com/originals/49/23/29/492329d446c422b0483677d0318ab4fa.gif"
+                        alt="">
+                </div>
+                <v-table class="month-table" v-if="!isLoading">
                     <thead>
                         <tr>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    Username
+                                    Product Name
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    First Name
+                                    Order Id
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    Last Name
+                                    Source
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    Email
+                                    Transaction Id
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    Address
+                                    User Email
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold" style="white-space: nowrap;">
                                 <h4>
-                                    Affiliate Code
+                                    Amount
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold" style="white-space: nowrap;">
                                 <h4>
-                                    Mentor account
+                                    Credit Card
                                 </h4>
                             </th>
                             <th class="text-subtitle-1 font-weight-bold">
                                 <h4>
-                                    Created At
+                                    Status
+                                </h4>
+                            </th>
+                            <th class="text-subtitle-1 font-weight-bold">
+                                <h4>
+                                    Order Date
                                 </h4>
                             </th>
 
@@ -136,77 +155,84 @@ const items = ref([{ name: "Users Source", value: "" }, { name: "Islamic Academy
                     <tbody>
                         <tr class="month-item" v-for="items in userData.results">
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.username }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.product_name }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.first_name }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.order_id }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.last_name }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.source }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p cclass="text-15 font-weight-medium">{{ items.email }}</p>
+                                    <p cclass="text-15 font-weight-medium">{{ items.transaction_id }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.address }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.customer_email }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.affiliate_code || "-" }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.amount }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p class="text-15 font-weight-medium">{{ items.isMentor ? "Yes" : "No" }}</p>
+                                    <p class="text-15 font-weight-medium">{{ items.credit_card || "-" }}</p>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div class="w-52">
 
-                                    <p cclass="text-15 font-weight-medium">{{ items.created_at }}</p>
+                                    <p cclass="text-15 font-weight-medium">{{ items.status }}</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="w-52">
+
+                                    <p cclass="text-15 font-weight-medium">{{ items.order_datetime }}</p>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </v-table>
+
+                <div className="flex gap-5 text-lg justify-end items-center py-12">
+                    <button @click="() => page--" v-if="page !== 1"
+                        className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.4 16.7998L9.60001 11.9998L14.4 7.19981" stroke="black" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    <p
+                        className="block px-5 py-2 text-gray-700 font-semibold placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                        {{ page }}
+                    </p>
+                    <button @click="() => page++"
+                        className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.59999 7.2002L14.4 12.0002L9.59999 16.8002" stroke="black" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
             </v-card-item>
-            <div className="flex gap-5 text-lg justify-end items-center py-12">
-                <button @click="() => page--" v-if="page !== 1"
-                    className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14.4 16.7998L9.60001 11.9998L14.4 7.19981" stroke="black" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-                <p
-                    className="block px-5 py-2 text-gray-700 font-semibold placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
-                    {{ page }}
-                </p>
-                <button @click="() => page++"
-                    className="block px-2 py-2 text-gray-700 placeholder-gray-400/70 bg-white border border-gray-200 rounded-lg">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9.59999 7.2002L14.4 12.0002L9.59999 16.8002" stroke="black" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
         </v-card>
     </div>
 </template>

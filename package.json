@@ -8,6 +8,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@dmuy/toast": "^2.0.3",
     "@mdi/font": "^6.5.95",
     "@nuxtjs/vuetify": "^1.12.3",
     "@pinia-plugin-persistedstate/nuxt": "^1.1.1",
